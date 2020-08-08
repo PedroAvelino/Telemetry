@@ -19,7 +19,7 @@
           <label for='faction'>Action: </label>
           <input type='text' id="faction" value='' v-model="myData.status.actions">
 
-          <input type="submit" value="GO!">
+          <input type="submit" value="FETCH!">
       </form>
     </div>
 
