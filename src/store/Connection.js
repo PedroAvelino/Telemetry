@@ -19,7 +19,7 @@ import Axios from 'axios'
 export default class Connection{
 
     constructor(local = false){
-        //TODO:initialize connection to firebase
+        
         const my = this._private_ = {
             local,
             firebaseConfig: {
@@ -59,7 +59,37 @@ export default class Connection{
                 let cmd = this._parseEdge( edge );
                 const collection = my.db.collection( cmd.collection );
                 
-                if(cmd.collection == "gettelemetry"){
+                if(cmd.command == "gettelemetry"){
+
+                    //access the doc by the doc id
+                    const query = await collection.where("playerId","==", data.playerId );
+                    
+                    let getDoc = query.get()
+                        .then( snapshot => {
+                            
+                            //If it's empty return null
+                            if(snapshot.empty){
+                                
+                                response.errorCode = 101;
+                                response.errorMsg = "No player found";
+                                response.payload.whatWasSent = data.playerId;
+                                resolve( response );
+
+                            }else{
+
+
+                                //Assuming there's only one unique player
+                                let myData;
+                                snapshot.forEach( doc => {
+                                    myData = doc.data();
+                                })
+
+                                response.payload = myData;
+                                response.ok();
+                                resolve( response );
+                            }
+                        })
+
 
                 }
                 else if(cmd.command != "update"){
@@ -82,7 +112,7 @@ export default class Connection{
                     let docRef = await query.set( data, { merge: true })
                                 .catch( err => reject( response ));
 
-                    response.payload = docRef.id;
+                    response.payload = docRef.command;
                     response.ok();
                     resolve( response );
                 }

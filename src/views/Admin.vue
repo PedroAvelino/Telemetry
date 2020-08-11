@@ -1,3 +1,5 @@
+<!-- Copyright (C) Pedro Avelino -->
+
 <template>
   <div id="app">
 
@@ -8,7 +10,7 @@
           <input type='text' id="fbuild" value='1' v-model="myData.buildNo">
 
           <label for='fbuild'>Player ID:</label>
-          <input type='text' id="fbuild" value='1' v-model="myData.playerId">
+          <input type='text' id="fplayerId" value='1' v-model="myData.playerId">
 
           <label for='fposx'>Posisition X:</label>
           <input type='text' id="fposx" value='' v-model="myData.position.x">
@@ -19,15 +21,15 @@
           <label for='faction'>Action: </label>
           <input type='text' id="faction" value='' v-model="myData.status.actions">
 
-          <input type="submit" value="FETCH!">
+          <input type="submit" value="GO!">
       </form>
     </div>
 
      <div>
-      <form @submit.prevent="goGetIt(myData)">
+      <form @submit.prevent="goGetIt()">
           <label for='fplayerid'>Player ID:</label>
-          <input type='text' id="fplayerid" value='' v-model="myData.playerId">
-          <input type="submit" value="GO!">
+          <input type='text' id="fplayerid" value='' v-model="fetchId">
+          <input type="submit" value="FETCH!">
       </form>
     </div>
 
@@ -48,6 +50,7 @@ class AdminController extends Controller {
             localRec: new TelemetryRecord( 1234, "", {x:0, y:0 }),
             savedRecords: [],
             
+            //Data to send
             myData: {
               buildNo: 1,
               
@@ -61,23 +64,33 @@ class AdminController extends Controller {
               },
 
               playerId: 0
+
             },
+
+            fetchId: 0,
+
+            fetchedData: {},
         };
 
         this.props = [];
 
         this.injectActions(["updateRecord", "getRecord"]);
-        this.injectGetters(["currentRec", "recordList", "recordCount"]);
+        this.injectGetters(["currentRec", "recordList", "recordCount", "newInfo"]);
     }
 
-    goGetIt( myData ) {
-      
-      console.log(myData.playerId);
+
+    //Get the player's data
+    goGetIt( ) {
 
       let payload = {
-        playerId:  myData.playerId
+        playerId:  this.fetchId
       }
+
       this.getRecord( payload );
+
+      this.fetchedData = this.newInfo;
+
+      console.log(this.newInfo);
     }
 
     saveRec( myData ) {

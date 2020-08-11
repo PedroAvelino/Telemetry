@@ -1,6 +1,6 @@
 /*
 VUEX Data Store.
-Copyright (c) 2019. Scott Henshaw, Kibble Online Inc. All Rights Reserved.
+Copyright (c) 2019. Pedro Avelino, All Rights Reserved.
 */
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -26,14 +26,10 @@ const store = new Vuex.Store({
         currentRec: state => state.currentRec,
         recordList: state => state.telemetryRAW.map( element => element.label ),
         recordCount: state => state.telemetryRAW.lenght,
-        newInfo: state => state.info
+        newInfo: state => state.info,
     },
 
     actions: {
-        
-        // async fetchRecord({ commit }, recId ){
-        //     //go fetch the record with the id and update the currentRec
-        // },
 
         async updateRecord({ commit }, newTRec ){
 
@@ -54,14 +50,26 @@ const store = new Vuex.Store({
 
         async getRecord( { commit }, playerId ){
             
-            let info = await cloud.post('/api/telemetry', playerId)
+            let info = await cloud.post(`/api/telemetry/gettelemetry`, playerId )
                 .catch( err => {
+                    
                     console.log( err );
+
                     return;
                 })
-            console.log( info );
-
-            commit('ADD_INFO')
+            
+            if(info.errorCode != -1)
+            {
+                alert(info.errorMsg);
+                console.log(info);
+            }
+            else{
+                let player = info.payload;
+                let myMsg = `Player Info: ${player.playerId}, X: ${player.pos.x }, Y: ${player.pos.y}, Action: ${player.action}`;
+                alert(myMsg);
+                commit('ADD_INFO', info.payload)
+            }
+            
         }
     },
 
